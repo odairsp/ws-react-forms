@@ -1,22 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import FormValues from "../FormValues";
 
 const defineLeftZero = (number) => number < 10 ? '0' : '';
 const hours = [...new Array(24)].map((value, index) => `${defineLeftZero(index)}${index}:00`);
 
 function QuotationForm() {
-    let formValues = null; // estamos cometendo uma heresia para explicar um conceito
-
+    // let formValues = null; // estamos cometendo uma heresia para explicar um conceito
+    const [formValues, setFormValues] = useState({
+        pickUpAgency: '',
+        pickUpDate: '',
+        pickUpHour: '',
+        specialRequest: ''
+    });
     const submit = (event) => {
         event.preventDefault();
-
-        const inputNames = ['pickUpAgency', 'pickUpDate', 'pickUpHour', 'specialRequest'];
-        const formInputs = event.target.elements;
-
-        formValues = inputNames.reduce((acc, name) => ({
-            ...acc,
-            [name]: formInputs[name].value
-        }), {});
 
         console.log(formValues);
     }
@@ -41,6 +38,7 @@ function QuotationForm() {
                             id="pickUpAgency"
                             name="pickUpAgency"
                             aria-describedby="pickUpAgencyHelp"
+                            value={formValues.pickUpAgency}
                         />
 
                         <div
@@ -66,6 +64,7 @@ function QuotationForm() {
                             id="pickUpDate"
                             name="pickUpDate"
                             aria-describedby="pickUpDateHelp"
+                            value={formValues.pickUpDate}
                         />
 
                         <div
@@ -91,6 +90,7 @@ function QuotationForm() {
                             id="pickUpHour"
                             name="pickUpHour"
                             aria-describedby="pickUpHourHelp"
+                            value={formValues.pickUpHour}
                         >
                             {hours.map((value) => (
                                 <option
@@ -129,6 +129,7 @@ function QuotationForm() {
                             id="specialRequest"
                             name="specialRequest"
                             aria-describedby="specialRequestHelp"
+                            value={formValues.specialRequest}
                         />
 
                         <div
@@ -157,7 +158,7 @@ function QuotationForm() {
             </form>
 
             <div className="mt-3">
-                <FormValues values={formValues}/>
+                <FormValues values={formValues} />
             </div>
 
         </>
