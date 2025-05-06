@@ -1,15 +1,60 @@
 import React from 'react';
 import { useFormik } from 'formik';
+import { date, object as schema, string } from 'yup';
 import FormValues from '../FormValues';
+import InputField from '../Form/InputField';
+import SelectField from '../Form/SelectField';
+import TextareaField from '../Form/TextaresField';
+import Loading from '../Loading/Loading';
 
 const defineLeftZero = (number) => number < 10 ? '0' : '';
 const hours = [...new Array(24)].map((value, index) => `${defineLeftZero(index)}${index}:00`);
+
+
+const validationSchema = schema({
+    pickUpAgency: string().required('É preciso preencher o local de retirada'),
+    pickUpDate: string()
+        .required('É preciso preencher a data de retirada')
+        .matches(/^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](20|21)\d\d$/, 'A data precisa estar no formato dd/mm/yyyy'),
+    pickUpHour: string().required('É preciso preencher a hora de retirada'),
+    specialRequest: string()
+})
+
+const sleep = (time = 1000) => {
+    new Promise((resolve) => {
+        setTimeout(() => resolve(true), time)
+    })
+}
+
+// const validate = (values) => {
+//     const errors = {};
+
+//     if (!values.pickUpAgency) {
+//         errors.pickUpAgency = 'É preciso preencher o local de retirada';
+//     }
+
+//     if (!values.pickUpDate) {
+//         errors.pickUpDate = 'É preciso preencher a data de retirada';
+//     }
+
+//     if (!values.pickUpHour) {
+//         errors.pickUpHour = 'É preciso preencher a hora de retirada';
+//     }
+
+//     return errors;
+// }
+
+
 
 function QuotationForm() {
     const {
         values: formValues,
         handleChange: handleFieldChange,
-        handleSubmit
+        handleSubmit,
+        handleBlur,
+        touched,
+        isSubmitting,
+        errors
     } = useFormik({
         initialValues: {
             pickUpAgency: '',
@@ -17,7 +62,9 @@ function QuotationForm() {
             pickUpHour: '',
             specialRequest: ''
         },
-        onSubmit: (values) => {
+        validationSchema,
+        onSubmit: async (values) => {
+            await sleep();
             console.log(values);
         }
     });
@@ -30,91 +77,47 @@ function QuotationForm() {
 
                     <div className="col-md-5">
 
-                        <label
-                            className="form-label"
-                            htmlFor="pickUpAgency"
-                        >
-                            Local de retirada
-                        </label>
-
-                        <input
-                            className="form-control"
+                        <InputField
                             id="pickUpAgency"
-                            name="pickUpAgency"
-                            aria-describedby="pickUpAgencyHelp"
-                            value={formValues.pickUpAgency}
+                            label='Local de Retirada'
+                            hint="Selecione o local onde deseja retirar o carro."
+                            error={errors.pickUpAgency}
+                            touched={touched.pickUpAgency}
                             onChange={handleFieldChange}
+                            onBlur={handleBlur}
                         />
 
-                        <div
-                            id="pickUpAgencyHelp"
-                            className="form-text"
-                        >
-                            Selecione o local onde deseja retirar o carro.
-                        </div>
+
 
                     </div>
 
                     <div className="col-md-4">
 
-                        <label
-                            className="form-label"
-                            htmlFor="pickUpDate"
-                        >
-                            Data de retirada
-                        </label>
-
-                        <input
-                            className="form-control"
+                        <InputField
                             id="pickUpDate"
-                            name="pickUpDate"
-                            aria-describedby="pickUpDateHelp"
+                            label="Data de retirada"
+                            hint="Selecione a data de retirada."
+                            touched={touched.pickUpDate}
+                            error={errors.pickUpDate}
                             value={formValues.pickUpDate}
                             onChange={handleFieldChange}
+                            onBlur={handleBlur}
                         />
-
-                        <div
-                            id="pickUpDateHelp"
-                            className="form-text"
-                        >
-                            Selecione a data de retirada.
-                        </div>
-
                     </div>
 
                     <div className="col-md-3">
 
-                        <label
-                            className="form-label"
-                            htmlFor="pickUpHour"
-                        >
-                            Horário de retirada
-                        </label>
-
-                        <select
-                            className="form-select"
+                        <SelectField
                             id="pickUpHour"
-                            name="pickUpHour"
-                            aria-describedby="pickUpHourHelp"
+                            label="Horário de retirada"
+                            hint="Selecione a hora de retirada."
+                            touched={touched.pickUpHour}
+                            error={errors.pickUpHour}
+                            options={hours}
                             value={formValues.pickUpHour}
                             onChange={handleFieldChange}
-                        >
-                            {hours.map((value) => (
-                                <option
-                                    key={value}
-                                    value={value}
-                                >
-                                    {value}
-                                </option>
-                            ))}
-                        </select>
-
-                        <div
-                            id="pickUpHourHelp"
-                            className="form-text"
-                        >
-                            Selecione a hora de retirada.
-                        </div>
+                            onBlur={handleBlur}
+                        />
 
                     </div>
 
@@ -124,29 +127,17 @@ function QuotationForm() {
 
                     <div className="col-md-12">
 
-                        <label
-                            className="form-label"
-                            htmlFor="specialRequest"
-                        >
-                            Pedido especial
-                        </label>
-
-                        <textarea
-                            className="form-control"
+                        <TextareaField
                             id="specialRequest"
-                            name="specialRequest"
-                            aria-describedby="specialRequestHelp"
+                            label="Pedido especial"
+                            hint="Esse é um espaço destinado especialmente para você nos contar como podemos lhe atender
+                            melhor."
+                            touched={touched.specialRequest}
+                            error={errors.specialRequest}
                             value={formValues.specialRequest}
                             onChange={handleFieldChange}
+                            onBlur={handleBlur}
                         />
-
-                        <div
-                            id="specialRequestHelp"
-                            className="form-text"
-                        >
-                            Esse é um espaço destinado especialmente para você nos contar como podemos lhe atender
-                            melhor
-                        </div>
 
                     </div>
 
@@ -157,8 +148,9 @@ function QuotationForm() {
                         <button
                             className="btn btn-primary"
                             type="submit"
+                            disabled={isSubmitting}
                         >
-                            Enviar
+                            Enviar {!!(isSubmitting )&& <span className='mx-2'><Loading /></span>}
                         </button>
                     </div>
                 </div>
@@ -166,7 +158,7 @@ function QuotationForm() {
             </form>
 
             <div className="mt-3">
-                <FormValues values={formValues}/>
+                <FormValues values={formValues} />
             </div>
 
         </>
